@@ -19,32 +19,33 @@ class ConversationMemberEntityRepository extends ServiceEntityRepository
         parent::__construct($registry, ConversationMemberEntity::class);
     }
 
-    // /**
-    //  * @return ConversationMemberEntity[] Returns an array of ConversationMemberEntity objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getOne(string $id): ConversationMemberEntity
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $id = $this->db->createQuery('SELECT * FROM ConversationMemberEntity WHERE id = :id');
+        $createQuery->execute();
 
-    /*
-    public function findOneBySomeField($value): ?ConversationMemberEntity
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        return $this->getOne($id);
     }
-    */
+
+    public function getByUser(string $id): array {
+        $id = $this->db->createQuery('SELECT * FROM ConversationMemberEntity where user_id = :id');
+        $createQuery->execute();
+        $conversation_member = [];
+        while ($data = $createQuery->fetch($id)) {
+            $conversation_member = new ConversationMemberEntity($data);
+        }
+
+        return $conversation_member;
+    }
+
+    public function getByConversation(string $id): array {
+        $id = $this->db->createQuery('SELECT * FROM ConversationMemberEntity where conversation_id = :id');
+        $createQuery->execute();
+        $message = [];
+        while ($data = $createQuery->fetch($id)) {
+            $conversation_member = new ConversationMemberEntity($data);
+        }
+
+        return $conversation_member;
+    }
 }

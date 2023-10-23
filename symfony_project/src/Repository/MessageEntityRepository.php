@@ -19,7 +19,7 @@ class MessageEntityRepository extends ServiceEntityRepository
         parent::__construct($registry, MessageEntity::class);
     }
 
-    public function getOne($string $id): MessageEntity {
+    public function getOne(string $id): MessageEntity {
         $id = $this->db->createQuery('SELECT * FROM MessageEntity WHERE id = :id');
         $createQuery->execute();
 
@@ -28,7 +28,7 @@ class MessageEntityRepository extends ServiceEntityRepository
 
     public function postOne(): MessageEntity
     {
-        $e =json_decode(file_get_contents('php://input');
+        $e =json_decode(file_get_contents('php://input'));
         $uniqId = uniqid('message');
         $id = $this->db->createQuery('INSERT INTO MessageEntity (id, conversation_id, user_id, content, date_sent) VALUES (:id, :conversation_id, :user_id, :content, :date_sent)');
         $createQuery->bindValue(':id', $uniqId);
@@ -47,7 +47,7 @@ class MessageEntityRepository extends ServiceEntityRepository
         $createQuery->execute();
     }
 
-    public function getByUser($string $id): array {
+    public function getByUser(string $id): array {
         $id = $this->db->createQuery('SELECT * FROM MessageEntity where user_id = :id');
         $createQuery->execute();
         $message = [];
@@ -58,7 +58,7 @@ class MessageEntityRepository extends ServiceEntityRepository
         return $message;
     }
 
-    public function getByConversation($string $id): array {
+    public function getByConversation(string $id): array {
         $id = $this->db->createQuery('SELECT * FROM MessageEntity where conversation_id = :id');
         $createQuery->execute();
         $message = [];

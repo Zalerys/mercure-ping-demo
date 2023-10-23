@@ -19,10 +19,6 @@ class ConversationEntityRepository extends ServiceEntityRepository
         parent::__construct($registry, ConversationEntity::class);
     }
 
-
-     @return ConversationEntity[] Returns an array of ConversationEntity objects
-
-
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('c')
@@ -55,7 +51,7 @@ class ConversationEntityRepository extends ServiceEntityRepository
 
     public function postOne(string $id, string $name): ConversationEntity
     {
-        $e =json_decode(file_get_contents('php://input');
+        $e =json_decode(file_get_contents('php://input'));
         $uniqId = uniqid('conversation');
         $id = $this->db->createQuery('INSERT INTO ConversationEntity (id) VALUES (:id)');
         $name = $this->db->createQuery('INSERT INTO ConversationEntity (name) VALUES (:name)');
@@ -72,7 +68,7 @@ class ConversationEntityRepository extends ServiceEntityRepository
         $createQuery->execute();
     }
 
-    public function getByUser($string $id): array {
+    public function getByUser(string $id): array {
         $id = $this->db->createQuery('SELECT * FROM ConversationEntity where user_id = :id');
         $createQuery->execute();
         $conversation = [];
