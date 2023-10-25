@@ -41,7 +41,8 @@ class SecurityController extends AbstractController
 //            $hub->publish($update);
 
             return $this->json([
-                'JWT' => $helper->createJWT($user)
+                'JWT' => $helper->createJWT($user),
+                'userId' => $user->getId()
             ], 200, [
                 'set-cookie' => $cookieHelper->createMercureCookie($user)
             ]);
