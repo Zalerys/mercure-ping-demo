@@ -44,6 +44,33 @@ class MessageController extends AbstractController
             'message' => 'Message envoyé avec succès'
         ]);
     }
+
+        #[Route('/send-message-to-all', name: 'send_message_to_all', methods: 'POST')]
+    public function sendMessageToAll(Request $request, HubInterface $hub)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data['content'])) {
+            return $this->json([
+                'error' => 'Message invalide'
+            ], 400);
+        }
+
+        $message = [
+            'message' => $data['content'],
+        ];
+
+        $publicUpdate = new Update(
+            'https://example.com/my-public-message-all',
+            json_encode(['message' => $message])
+        );
+
+        $hub->publish($publicUpdate);
+
+        return $this->json([
+            'message' => 'Message envoyé à tout le monde avec succès'
+        ]);
+    }
 }
 
 
