@@ -31,6 +31,7 @@ export default function Login() {
       if (data.JWT) {
         setLoggedUser(data.JWT);
         sessionStorage.setItem("user", username);
+        sessionStorage.setItem("id", data.userId);
         navigate(from, { replace: true });
       } else {
         console.log(data);
