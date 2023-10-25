@@ -47,7 +47,6 @@ export default function UserList() {
       const userIdMatch = userList.find(
         (user) => user.username === data.content.message.user
       );
-      console.log("out", userIdMatch);
 
       if (userIdMatch) {
         console.log("int", userIdMatch);
@@ -123,11 +122,11 @@ export default function UserList() {
           </div>
         ))}
       </div>
-      {/* <div>
+      <div>
         <Link to="/all">
           <button>Chat All Page</button>
         </Link>
-      </div> */}
+      </div>
     </div>
   );
 }
