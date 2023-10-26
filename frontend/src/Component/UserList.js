@@ -1,36 +1,15 @@
 import { useEffect, useState } from "react";
 import useGetUserList from "../Hook/useGetUserList";
 import useBackendPing from "../Hook/useBackendPing";
-import useBackendMessage from "../Hook/useBackendMessage";
 import User from "./User";
-import { Link } from "react-router-dom";
+import Chat from "./Chat";
 
-export default function UserList() {
+export default function UserList({ submitMessagePrivate, currentUser, user }) {
   const [userList, setUserList] = useState([]);
   const [isOpen, setIsOpen] = useState({});
   const [sentMessages, setSentMessages] = useState({});
   const getUserList = useGetUserList();
   const backendPing = useBackendPing();
-  const backendMessage = useBackendMessage();
-
-  const currentUser = sessionStorage.getItem("user");
-
-  const submitMessagePrivate = async (e) => {
-    const message = e.target[0].value;
-    const userId = e.target[0].dataset.userid;
-    const data = { message: message, user: currentUser };
-    backendMessage(userId, data).then((data) => {
-      setSentMessages((prevMessages) => ({
-        ...prevMessages,
-        [userId]: [
-          ...(prevMessages[userId] || []),
-          { user: currentUser, message },
-        ],
-      }));
-    });
-
-    e.preventDefault();
-  };
 
   const handleClick = (userId) => {
     backendPing(userId).then((data) => console.log(data));
@@ -100,9 +79,11 @@ export default function UserList() {
   }, []);
 
   return (
-    <div className="w-100 d-flex">
-      <div className="w-75">
-        <h1 className="m-5 text-center">Hello {currentUser}</h1>
+    <div className="flex">
+      <div className="w-1/2 h-screen px-10 bg-gray-100">
+        <h1 className="w-full py-5 text-2xl font-semibold text-center text-sky-800">
+          Hello {currentUser}
+        </h1>
         {userList.map((user) => (
           <div key={user.id}>
             <User
@@ -111,23 +92,15 @@ export default function UserList() {
               isOpen={isOpen}
               submitMessagePrivate={submitMessagePrivate}
             />
-            {sentMessages[user.id] && (
-              <div className="m-5 text-center">
-                {sentMessages[user.id].map((messageObj, index) => (
-                  <span key={index}>
-                    {messageObj.user}: {messageObj.message}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         ))}
       </div>
-      {/* <div>
-        <Link to="/all">
-          <button>Chat All Page</button>
-        </Link>
-      </div> */}
+      
+      <Chat
+        sentMessages={sentMessages}
+        setSentMessages={setSentMessages}
+        user={user}
+      />
     </div>
   );
 }

@@ -4,6 +4,10 @@ module.exports = {
   theme: {
     extend: {},
   },
+  colors: {
+    'primary': {
+      p_blue: '#0f766e',
+    },
   plugins: [],
 }
-
+}

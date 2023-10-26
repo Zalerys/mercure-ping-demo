@@ -44,7 +44,7 @@ export default function Login() {
         className="flex flex-col justify-around bg-white shadow-md rounded-sm px-8 pt-8 pb-8 w-1/4 h-1/3 mb-4"
         onSubmit={handleSubmit}
       >
-        <h1 className="mb-2 text-md text-teal-700 text-center font-semibold ">
+        <h1 className="mb-2 text-md text-sky-800 text-center font-semibold ">
           Login
         </h1>
         <div className="flex flex-col mb-3">
@@ -73,7 +73,7 @@ export default function Login() {
           />
         </div>
         <button
-          className="text-white bg-teal-500 w-32 mx-auto rounded-md p-2"
+          className="text-white bg-sky-800 w-32 mx-auto rounded-md p-2"
           type="submit"
         >
           Se connecter
