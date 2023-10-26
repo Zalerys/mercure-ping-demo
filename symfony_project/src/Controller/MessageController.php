@@ -1,51 +1,112 @@
 <?php
+
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\Conversation;
+use App\Entity\Message;
+use App\Repository\MessageRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route("/messages", name="messages.")
+ */
 class MessageController extends AbstractController
 {
-    #[Route('/send-message/{user}', name: 'send_message_to_user', methods: 'POST')]
-    public function sendMessageToUser(Request $request, User $user, HubInterface $hub)
+
+    const ATTRIBUTES_TO_SERIALIZE = ['id', 'content', 'createdAt', 'mine'];
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private EntityManagerInterface $entityManager;
+    /**
+     * @var MessageRepository
+     */
+    private MessageRepository $messageRepository;
+    /**
+     * @var UserRepository
+     */
+    private UserRepository $userRepository;
+
+    public function __construct(EntityManagerInterface $entityManager,
+                                MessageRepository $messageRepository,
+                                UserRepository $userRepository)
     {
-        $data = json_decode($request->getContent(), true);
+        $this->entityManager = $entityManager;
+        $this->messageRepository = $messageRepository;
+        $this->userRepository = $userRepository;
+    }
 
-        if (!$data || !isset($data['content'])) {
-            return $this->json([
-                'error' => 'Message invalide'
-            ], 400);
-        }
+    /**
+     * @Route("/{id}", name="getMessages", methods={"GET"})
+     * @param Request $request
+     * @param Conversation $conversation
+     * @return Response
+     */
+    public function index(Request $request, Conversation $conversation): Response
+    {
+        // can i view the conversation
 
-        $message = [
-            'message' => $data['content'],
-        ];
+        $this->denyAccessUnlessGranted('view', $conversation);
 
-
-        $update = new Update(
-            [
-                "https://example.com/my-private-topic",
-                "https://example.com/user/{$user->getId()}/?topic=" . urlencode("https://example.com/my-private-topic")
-            ],
-            json_encode([
-                'content' => $message,
-            ]),
-            true
+        $messages = $this->messageRepository->findMessageByConversationId(
+            $conversation->getId()
         );
 
+        /**
+         * @var $message Message
+         */
+        array_map(function ($message) {
+            $message->setMine(
+                $message->getUser()->getId() === $this->getUser()->getId()
+            );
+        }, $messages);
 
-        $hub->publish($update);
 
-        return $this->json([
-            'message' => 'Message envoyé avec succès'
+        return $this->json($messages, Response::HTTP_OK, [], [
+            'attributes' => self::ATTRIBUTES_TO_SERIALIZE
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="newMessage", methods={"POST"})
+     * @param Request $request
+     * @param Conversation $conversation
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function newMessage(Request $request, Conversation $conversation): JsonResponse
+    {
+        // TODO: put everything back
+        $user = $this->getUser();
+        $content = $request->get('content', null);
+        $message = new Message();
+        $message->setContent($content);
+        $message->setUser($this->userRepository->findOneBy(['id' => 2]));
+        $message->setMine(true);
+
+        $conversation->addMessage($message);
+        $conversation->setLastMessage($message);
+
+        $this->entityManager->getConnection()->beginTransaction();
+        try {
+            $this->entityManager->persist($message);
+            $this->entityManager->persist($conversation);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
+        }
+
+        return $this->json($message, Response::HTTP_CREATED, [], [
+            'attributes' => self::ATTRIBUTES_TO_SERIALIZE
         ]);
     }
 }
-
-
-
-
