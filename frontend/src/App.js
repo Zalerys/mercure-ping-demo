@@ -1,4 +1,3 @@
-import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NeedAuth from "./Auth/NeedAuth";
 import UserList from "./Component/UserList";

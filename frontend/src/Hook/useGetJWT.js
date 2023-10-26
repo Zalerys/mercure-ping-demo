@@ -1,5 +1,3 @@
-import data from "bootstrap/js/src/dom/data";
-
 export default function useGetJWT() {
 
     return async function (username, password) {
