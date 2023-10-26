@@ -42,7 +42,10 @@ export default function UserList() {
       setUserList(filteredUserList);
     });
     const url = new URL("http://localhost:9090/.well-known/mercure");
-    url.searchParams.append("topic", "https://example.com/my-private-topic");
+    url.searchParams.append(
+      "topic",
+      "https://example.com/my-private-topic-ping"
+    );
 
     const eventSource = new EventSource(url, { withCredentials: true });
     eventSource.onmessage = handleMessage;
