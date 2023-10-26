@@ -1,61 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useGetUserList from "../Hook/useGetUserList";
 import useBackendPing from "../Hook/useBackendPing";
 import User from "./User";
 import Chat from "./Chat";
 
-export default function UserList({ submitMessagePrivate, currentUser, user }) {
+export default function UserList() {
+  const currentUser = sessionStorage.getItem("user");
   const [userList, setUserList] = useState([]);
-  const [isOpen, setIsOpen] = useState({});
-  const [sentMessages, setSentMessages] = useState({});
   const getUserList = useGetUserList();
   const backendPing = useBackendPing();
 
-  const handleClick = (userId) => {
-    backendPing(userId).then((data) => console.log(data));
+  const [userMessage, setUserMessage] = useState();
 
-    setIsOpen((prevState) => ({
-      ...prevState,
-      [userId]: !prevState[userId],
-    }));
+  const handleClick = (user) => {
+    backendPing(user).then((data) => console.log(data));
+    setUserMessage(user);
   };
 
   const handleMessage = (e) => {
     const data = JSON.parse(e.data);
-    if (data.content) {
-      const userIdMatch = userList.find(
-        (user) => user.username === data.content.message.user
+    const userName = data.user;
+    document
+      .querySelector("h1")
+      .insertAdjacentHTML(
+        "afterend",
+        `<div class="alert alert-success w-75 mx-auto">Ping ${userName}</div>`
       );
-      console.log("out", userIdMatch);
-
-      if (userIdMatch) {
-        console.log("int", userIdMatch);
-        setSentMessages((prevMessages) => ({
-          ...prevMessages,
-          [userIdMatch.id]: [
-            ...(prevMessages[userIdMatch.id] || []),
-            {
-              user: data.content.message.user,
-              message: data.content.message.message,
-            },
-          ],
-        }));
-      }
-    } else {
-      console.log("ping");
-
-      const userName = data.user;
-      document
-        .querySelector("h1")
-        .insertAdjacentHTML(
-          "afterend",
-          `<div class="alert alert-success w-75 mx-auto">Ping ${userName}</div>`
-        );
-      window.setTimeout(() => {
-        const $alert = document.querySelector(".alert");
-        $alert.parentNode.removeChild($alert);
-      }, 2000);
-    }
+    window.setTimeout(() => {
+      const $alert = document.querySelector(".alert");
+      $alert.parentNode.removeChild($alert);
+    }, 2000);
   };
 
   useEffect(() => {
@@ -64,7 +38,6 @@ export default function UserList({ submitMessagePrivate, currentUser, user }) {
       const filteredUserList = userListArray.filter(
         (user) => user.username !== currentUser
       );
-
       setUserList(filteredUserList);
     });
     const url = new URL("http://localhost:9090/.well-known/mercure");
@@ -85,22 +58,21 @@ export default function UserList({ submitMessagePrivate, currentUser, user }) {
           Hello {currentUser}
         </h1>
         {userList.map((user) => (
-          <div key={user.id}>
-            <User
-              user={user}
-              handleClick={handleClick}
-              isOpen={isOpen}
-              submitMessagePrivate={submitMessagePrivate}
-            />
+          <div key={user.id} className="block">
+            <User user={user} handleClick={handleClick} />
           </div>
         ))}
       </div>
-      
-      <Chat
-        sentMessages={sentMessages}
-        setSentMessages={setSentMessages}
-        user={user}
-      />
+      <div className="px-10">
+        {userMessage ? (
+          <>
+            <h1 className="w-full py-5 text-2xl font-semibold text-center text-sky-800">
+              Speaking with {userMessage}
+            </h1>
+            <Chat user={userMessage} userList={userList} />
+          </>
+        ) : null}{" "}
+      </div>
     </div>
   );
 }

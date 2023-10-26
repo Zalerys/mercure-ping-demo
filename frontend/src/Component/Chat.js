@@ -1,63 +1,88 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import useBackendMessage from "../Hook/useBackendMessage";
 
-function Chat({ user, setSentMessages, message, sentMessages }) {
-  
+function Chat({ user, userList }) {
   const backendMessage = useBackendMessage();
   const currentUser = sessionStorage.getItem("user");
+  const [message, setMessage] = useState("");
+  const [sentMessages, setSentMessages] = useState({});
 
-  const submitMessagePrivate = async (e) => {
-    const message = e.target[0].value;
-    const userId = e.target[0].dataset.userid;
+  const submitMessagePrivate = async () => {
     const data = { message: message, user: currentUser };
-    backendMessage(userId, data).then((data) => {
+    backendMessage(user, data).then((data) => {
       setSentMessages((prevMessages) => ({
         ...prevMessages,
-        [userId]: [
-          ...(prevMessages[userId] || []),
-          { user: currentUser, message },
-        ],
+        [user]: [...(prevMessages[user] || []), { user: currentUser, message }],
       }));
     });
-
-    e.preventDefault();
   };
 
+  const handleMessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.content) {
+      const userIdMatch = userList.find(
+        (user) => user.username === data.content.message.user
+      );
+
+      if (userIdMatch) {
+        setSentMessages((prevMessages) => ({
+          ...prevMessages,
+          [userIdMatch.id]: [
+            ...(prevMessages[userIdMatch.id] || []),
+            {
+              user: data.content.message.user,
+              message: data.content.message.message,
+            },
+          ],
+        }));
+      }
+    }
+  };
+
+  useEffect(() => {
+    const url = new URL("http://localhost:9090/.well-known/mercure");
+    url.searchParams.append("topic", "https://example.com/my-private-topic");
+
+    const eventSource = new EventSource(url, { withCredentials: true });
+    eventSource.onmessage = handleMessage;
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
   return (
-    <div>
-        <div className="w-1/2 h-screen px-10 bg-gray-100">
-            <div key={user.id}>
-              {sentMessages[user.id] && (
-                <div className="m-5 text-center">
-                  {sentMessages[user.id].map((messageObj, index) => (
-                    <span key={index}>
-                      {messageObj.user}: {messageObj.message}
-                    </span>
-                  ))}
-                </div>
-              )}
+    <div className="h-screen px-10">
+      <div className=" bg-gray-100">
+        <div key={user.id}>
+          {sentMessages[user] && (
+            <div className="m-5 text-center">
+              {sentMessages[user].map((messageObj, index) => (
+                <span key={index}>
+                  {messageObj.user}: {messageObj.message}
+                </span>
+              ))}
             </div>
+          )}
         </div>
-        
-        <form className="" onSubmit={submitMessagePrivate}>
-          <div class="flex">
-            <input
-              data-userid={user.id}
-              value={message}
-              onChange={(e) => sentMessages(e.target.value)}
-              class="form-control"
-              placeholder="Écrire un message"
-              aria-describedby="basic-addon2"
-              className="w-full mb-2 border-2 rounded-sm border-sky-700"
-            />
-            <div class="">
-              <button type="submit" className="">
-                Envoyé
-              </button>
-            </div>
-          </div>
-        </form>
       </div>
+
+      <div className="flex">
+        <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          class="form-control"
+          placeholder="Écrire un message"
+          aria-describedby="basic-addon2"
+          className="w-full mb-2 border-2 rounded-sm border-sky-700"
+        />
+        <div>
+          <button type="submit" onClick={submitMessagePrivate}>
+            Envoyé
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
