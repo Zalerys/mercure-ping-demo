@@ -16,8 +16,8 @@ class PingController extends AbstractController
     {
         $update = new Update(
             [
-                "https://example.com/my-private-topic",
-                "https://example.com/user/{$user->getId()}/?topic=" . urlencode("https://example.com/my-private-topic")
+                "https://example.com/my-private-topic-ping",
+                "https://example.com/user/{$user->getId()}/?topic=" . urlencode("https://example.com/my-private-topic-ping")
             ],
             json_encode([
                 'user' => $user->getUsername(),
