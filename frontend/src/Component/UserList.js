@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import useGetUserList from "../Hook/useGetUserList";
 import useBackendPing from "../Hook/useBackendPing";
+import { Link } from "react-router-dom";
 import User from "./User";
 import Chat from "./Chat";
 
@@ -72,6 +73,7 @@ export default function UserList() {
             <Chat user={userMessage} userList={userList} />
           </>
         ) : null}{" "}
+      </div>
       <div>
         <Link to="/all">
           <button>Chat All Page</button>
