@@ -2,38 +2,36 @@
 
 namespace App\Entity;
 
+use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\MessageRepository")
- * @ORM\Table(indexes={@Index(name="created_at_index", columns={"created_at"})})
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\HasLifecycleCallbacks()]
+
 class Message
 {
     use Timestamp;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+
+     #[ORM\Id]
+     #[ORM\GeneratedValue]
+     #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+
+     #[ORM\Column(type: "text")]
+
     private ?string $content;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="messages")
-     */
+     #[ORM\ManyToOne(targetEntity: "User", inversedBy: "messages")]
+
     private ?User $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Conversation", inversedBy="messages")
-     */
+
+     #[ORM\ManyToOne(targetEntity: "Conversation", inversedBy: "messages")]
+
     private ?Conversation $conversation;
 
     private mixed $mine;

@@ -2,38 +2,38 @@
 
 namespace App\Entity;
 
+use App\Repository\ConversationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\ConversationRepository")
- * @ORM\Table(indexes={@Index(name="last_message_id_index", columns={"last_message_id"})})
- */
+
+#[ORM\Entity(repositoryClass: ConversationRepository::class)]
+
 class Conversation
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+
+     #[ORM\Id]
+     #[ORM\GeneratedValue]
+     #[ORM\Column(type: "integer")]
+
     private $id;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Participant", mappedBy="conversation")
-     */
+
+     #[ORM\OneToMany(mappedBy: "conversation", targetEntity: "Participant")]
+
     private ArrayCollection $participants;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Message")
-     * @ORM\JoinColumn(name="last_message_id", referencedColumnName="id")
-     */
+
+     #[ORM\OneToOne(targetEntity: "Message")]
+     #[ORM\JoinColumn(name: "last_message_id", referencedColumnName: "id")]
+
     private ?Message $lastMessage;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Message", mappedBy="conversation")
-     */
+
+     #[ORM\OneToMany(mappedBy: "conversation", targetEntity: "Message")]
+
     private ArrayCollection $messages;
 
     public function __construct()

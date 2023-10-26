@@ -6,24 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait Timestamp
 {
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $createdAt;
+     #[ORM\Column(type: "datetime")]
+     private $createdAt;
 
-    /**
-     * @return mixed
-     */
+
     public function getCreatedAt()
     {
         return $this->createdAt;
     }
 
-    /**
-     * @ORM\PrePersist()
-     */
-    public function prePersist()
-    {
+
+     #[ORM\PrePersist]
+
+    public function prePersist(): void
+     {
         $this->createdAt = new \DateTime();
     }
 }
