@@ -72,6 +72,10 @@ export default function UserList() {
             <Chat user={userMessage} userList={userList} />
           </>
         ) : null}{" "}
+      <div>
+        <Link to="/all">
+          <button>Chat All Page</button>
+        </Link>
       </div>
     </div>
   );
