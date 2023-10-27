@@ -71,7 +71,6 @@ function Chat({ user, userList }) {
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          class="form-control"
           placeholder="Écrire un message"
           aria-describedby="basic-addon2"
           className="w-full mb-2 border-2 rounded-sm border-sky-700"
