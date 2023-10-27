@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/messages", name="messages.")
- */
+
+ #[Route("/messages", name: "messages.")]
+
 class MessageController extends AbstractController
 {
 
@@ -51,7 +51,6 @@ class MessageController extends AbstractController
      */
     public function index(Request $request, Conversation $conversation): Response
     {
-        // can i view the conversation
 
         $this->denyAccessUnlessGranted('view', $conversation);
 

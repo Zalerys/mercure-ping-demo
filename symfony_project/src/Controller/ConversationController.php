@@ -12,9 +12,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-/**
- * @Route("/conversations", name="conversations.")
- */
+
+
+ #[Route("/conversations", name: "conversations.")]
+
 class ConversationController extends AbstractController
 {
     /**
@@ -51,12 +52,12 @@ class ConversationController extends AbstractController
         $otherUser = $this->userRepository->find($otherUser);
 
         if (is_null($otherUser)) {
-            throw new \Exception("The user was not found");
+            throw new \Exception("Utilisateur non trouvé");
         }
 
         // cannot create a conversation with myself
         if ($otherUser->getId() === $this->getUser()->getId()) {
-            throw new \Exception("That's deep but you cannot create a conversation with yourself");
+            throw new \Exception("Impossible de créer une conversation avec soi-même");
         }
 
         // Check if conversation already exists
@@ -66,7 +67,7 @@ class ConversationController extends AbstractController
         );
 
         if (count($conversation)) {
-            throw new \Exception("The conversation already exists");
+            throw new \Exception("Cette conversation existe déjà");
         }
 
         $conversation = new Conversation();
@@ -102,7 +103,7 @@ class ConversationController extends AbstractController
 
 
     /**
-     * @Route("/", name="getConversations", methods={"GET"})
+     * @Route("/get-conversation", name="getConversations", methods={"GET"})
      */
     public function getConvs(): JsonResponse
     {
