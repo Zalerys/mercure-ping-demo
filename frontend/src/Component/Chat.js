@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useBackendMessage from "../Hook/useBackendMessage";
+import { SendHorizontal } from "lucide-react";
 
 function Chat({ user, userList }) {
   const backendMessage = useBackendMessage();
@@ -52,36 +53,44 @@ function Chat({ user, userList }) {
   }, []);
 
   return (
-    <div className="h-screen px-10">
-      <div className=" bg-gray-100">
-        <div key={user.id}>
-          {sentMessages[user] && (
-            <div className="m-5 text-center">
-              {sentMessages[user].map((messageObj, index) => (
-                <span key={index}>
-                  {messageObj.user}: {messageObj.message}
-                </span>
-              ))}
-            </div>
-          )}
+    <>
+      <div className="w-full h-screen bg-gray-100">
+        <div className="bg-gray-100">
+          <div key={user.id}>
+            {sentMessages[user] && (
+              <div className="m-5 text-center">
+                {sentMessages[user].map((messageObj, index) => (
+                  <span className="flex" key={index}>
+                    {messageObj.user}: {messageObj.message}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      <div className="flex">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Écrire un message"
-          aria-describedby="basic-addon2"
-          className="w-full mb-2 border-2 rounded-sm border-sky-700"
-        />
-        <div>
-          <button type="submit" onClick={submitMessagePrivate}>
-            Envoyé
-          </button>
+      <div className="fixed bottom-0 w-3/4">
+        <div className="flex">
+          <input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            class="form-control"
+            placeholder="Écrire un message"
+            aria-describedby="basic-addon2"
+            className="w-5/6 py-4 pl-2 border-t-2 border-gray-300"
+          />
+          <div className="flex items-center justify-center w-1/6 p-3 bg-blue-200 hover:bg-blue-400">
+            <button
+              type="submit"
+              className="flex text-center"
+              onClick={submitMessagePrivate}
+            >
+              <SendHorizontal />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

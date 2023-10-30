@@ -57,31 +57,34 @@ export default function UserList() {
   }, []);
 
   return (
-    <div className="flex">
-      <div className="w-1/2 h-screen px-10 bg-gray-100">
-        <h1 className="w-full py-5 text-2xl font-semibold text-center text-sky-800">
+    <div className="flex w-full">
+      <div className="w-1/4 h-screen bg-white">
+        <h1 className="w-full py-5 text-2xl font-semibold text-center text-gray">
           Hello {currentUser}
         </h1>
+
+        <div className="w-full pb-5 text-center">
+          <Link to="/all">
+            <button className="p-3 bg-blue-200 rounded-sm hover:bg-blue-400">Chat All Page</button>
+          </Link>
+        </div>
+
         {userList.map((user) => (
           <div key={user.id} className="block">
             <User user={user} handleClick={handleClick} />
           </div>
         ))}
       </div>
-      <div className="px-10">
+      <div className="w-3/4 bg-gray-100">
         {userMessage ? (
           <>
-            <h1 className="w-full py-5 text-2xl font-semibold text-center text-sky-800">
-              Speaking with {userMessage}
+            <h1 className="w-full p-5 text-2xl font-semibold text-center text-black bg-blue-200">
+              {userMessage}
             </h1>
             <Chat user={userMessage} userList={userList} />
           </>
         ) : null}{" "}
-      </div>
-      <div>
-        <Link to="/all">
-          <button>Chat All Page</button>
-        </Link>
+        <div></div>
       </div>
     </div>
   );
