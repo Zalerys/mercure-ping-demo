@@ -69,7 +69,6 @@ function Chat({ user, userList }) {
           </div>
         </div>
       </div>
-
       <div className="fixed bottom-0 w-3/4">
         <div className="flex">
           <input

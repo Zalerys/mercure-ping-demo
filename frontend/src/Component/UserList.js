@@ -15,6 +15,7 @@ export default function UserList() {
 
   const handleClick = (user) => {
     backendPing(user).then((data) => console.log(data));
+    console.log("user: ", user);
     setUserMessage(user);
   };
 
@@ -25,7 +26,7 @@ export default function UserList() {
       .querySelector("h1")
       .insertAdjacentHTML(
         "afterend",
-        `<div class="alert alert-success w-75 mx-auto">Ping ${userName}</div>`
+        `<div className="alert alert-success w-75 mx-auto">Ping ${userName}</div>`
       );
     window.setTimeout(() => {
       const $alert = document.querySelector(".alert");
