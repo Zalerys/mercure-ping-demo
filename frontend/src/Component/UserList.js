@@ -26,7 +26,7 @@ export default function UserList() {
       .querySelector("h1")
       .insertAdjacentHTML(
         "afterend",
-        `<div className="alert alert-success w-75 mx-auto">Ping ${userName}</div>`
+        `<div className="mx-auto alert alert-success w-75">Ping ${userName}</div>`
       );
     window.setTimeout(() => {
       const $alert = document.querySelector(".alert");
@@ -58,7 +58,7 @@ export default function UserList() {
 
   return (
     <div className="flex w-full">
-      <div className="w-1/4 h-screen bg-white">
+      <div className="w-1/4 h-screen bg-gray-200">
         <h1 className="w-full py-5 text-2xl font-semibold text-center text-gray">
           Hello {currentUser}
         </h1>

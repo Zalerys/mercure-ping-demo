@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import useBackendMessageToAll from "../Hook/useBackendMessageToAll";
 import useGetUserList from "../Hook/useGetUserList";
 import { Link } from "react-router-dom";
+import { SendHorizontal } from "lucide-react";
 
 export default function UserList() {
   const [receivedMessages, setReceivedMessages] = useState([]);
@@ -60,19 +61,24 @@ export default function UserList() {
 
   return (
     <div className="w-75">
-      <div>
-        <Link to="/">
-          <button>Back</button>
-        </Link>
-      </div>
-      <h1 className="m-5 text-center">Chat Général</h1>
+      <Link to="/">
+        <div className="p-5 bg-gray-100">
+          <button className="p-3 bg-blue-200 rounded-sm hover:bg-blue-400">
+            Back
+          </button>
+        </div>
+      </Link>
+      <h1 className="p-5 text-xl font-semibold text-center border-y-4">
+        Chat Général
+      </h1>
 
-      <div className="messages-container">
-        <div className="messages">
+      <div className="w-full h-screen overflow-y-scroll bg-gray-100">
+        <div className="pb-16">
           {receivedMessages.map((message, index) => (
-            <div key={index} className="message">
-              <span className="message-user">{message.user}: </span>
-              <span className="message-text">{message.message}</span>
+            <div key={index} className="p-2 text-center">
+              <span className="flex">
+                {message.user}: {message.message}
+              </span>
             </div>
           ))}
         </div>
@@ -80,21 +86,23 @@ export default function UserList() {
 
       <form
         onSubmit={submitMessageAll}
-        className="d-flex flex-column w-75 h-50 input-group mx-auto"
+        className="mx-auto d-flex flex-column w-75 h-50"
       >
-        <div className="d-flex">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Écrire un message"
-            aria-describedby="basic-addon2"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-          />
-          <div className="input-group-append">
-            <button className="btn btn-outline-secondary" type="submit">
-              Envoyer
-            </button>
+        <div className="fixed bottom-0 w-full">
+          <div className="flex">
+            <input
+              type="text"
+              className="w-5/6 py-4 pl-2 border-t-2 border-gray-300 form-control"
+              placeholder="Écrire un message"
+              aria-describedby="basic-addon2"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <div className="flex items-center justify-center w-1/6 p-3 bg-blue-200 hover:bg-blue-400">
+              <button className="" type="submit">
+                <SendHorizontal />
+              </button>
+            </div>
           </div>
         </div>
       </form>
