@@ -10,7 +10,7 @@ function Chat({ user, userList }) {
 
   const submitMessagePrivate = async () => {
     const data = { message: message, user: currentUser };
-    backendMessage(user, data).then((data) => {
+    backendMessage(user, message, currentUser).then((data) => {
       setSentMessages((prevMessages) => ({
         ...prevMessages,
         [user]: [...(prevMessages[user] || []), { user: currentUser, message }],
@@ -22,17 +22,17 @@ function Chat({ user, userList }) {
     const data = JSON.parse(e.data);
     if (data.content) {
       const userIdMatch = userList.find(
-        (user) => user.username === data.content.message.user
+        (user) => user.username === data.currentUser
       );
-
+      console.log(userIdMatch);
       if (userIdMatch) {
         setSentMessages((prevMessages) => ({
           ...prevMessages,
           [userIdMatch.id]: [
             ...(prevMessages[userIdMatch.id] || []),
             {
-              user: data.content.message.user,
-              message: data.content.message.message,
+              user: data.currentUser,
+              message: data.content.message,
             },
           ],
         }));
