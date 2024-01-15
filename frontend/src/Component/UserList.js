@@ -5,13 +5,17 @@ import useBackendCreateConversation from "../Hook/useBackendCreateConversation";
 import { Link } from "react-router-dom";
 import User from "./User";
 import Chat from "./Chat";
+import useGetLastMessage from '../Hook/useGetLastMessage';  
+
 
 export default function UserList() {
   const currentUser = sessionStorage.getItem("user");
   const [userList, setUserList] = useState([]);
   const [conversationId, setConversationId] = useState(null);
+  const [historyConversation, setHistoryConversation] = useState([])
   const getUserList = useGetUserList();
   const backendPing = useBackendPing();
+  const getLastMessages = useGetLastMessage(); 
   const backendCreateConversation = useBackendCreateConversation();
 
   const [userMessage, setUserMessage] = useState();
@@ -22,7 +26,9 @@ export default function UserList() {
     backendCreateConversation(userIds).then((data) => {
       setConversationId(data.conversation_id);
     });
-
+    getLastMessages(conversationId).then((data) => {
+      setHistoryConversation(data.content);
+    });
     setUserMessage(user);
   };
 
@@ -94,6 +100,7 @@ export default function UserList() {
               user={userMessage}
               userList={userList}
               conversationId={conversationId}
+              historyConversation={historyConversation}
             />
           </>
         ) : null}{" "}
