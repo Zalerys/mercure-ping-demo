@@ -1,56 +1,67 @@
 import { useEffect, useState } from "react";
 import useBackendMessage from "../Hook/useBackendMessage";
 import { SendHorizontal } from "lucide-react";
+import useGetLastMessage from '../Hook/useGetLastMessage';  
 
 function Chat({ user, userList, conversationId }) {
   const backendMessage = useBackendMessage();
   const currentUser = sessionStorage.getItem("user");
   const [message, setMessage] = useState("");
   const [sentMessages, setSentMessages] = useState({});
-
-  const submitMessagePrivate = async () => {
-    const data = { message: message, user: currentUser };
-    backendMessage(user, message, currentUser, conversationId).then((data) => {
-      setSentMessages((prevMessages) => ({
-        ...prevMessages,
-        [user]: [...(prevMessages[user] || []), { user: currentUser, message }],
-      }));
-    });
-  };
-
-  const handleMessage = (e) => {
-    const data = JSON.parse(e.data);
-    if (data.content) {
-      const userIdMatch = userList.find(
-        (user) => user.username === data.currentUser
-      );
-      console.log(userIdMatch);
-      if (userIdMatch) {
+  const getLastMessages = useGetLastMessage(); 
+  
+    const submitMessagePrivate = async () => {
+      const data = { message: message, user: currentUser };
+      backendMessage(user, message, currentUser, conversationId).then(() => {
         setSentMessages((prevMessages) => ({
           ...prevMessages,
-          [userIdMatch.id]: [
-            ...(prevMessages[userIdMatch.id] || []),
-            {
-              user: data.currentUser,
-              message: data.content.message,
-            },
-          ],
+          [user]: [...(prevMessages[user] || []), { user: currentUser, message }],
         }));
-      }
-    }
-  };
-
-  useEffect(() => {
-    const url = new URL("http://localhost:9090/.well-known/mercure");
-    url.searchParams.append("topic", "https://example.com/my-private-topic");
-
-    const eventSource = new EventSource(url, { withCredentials: true });
-    eventSource.onmessage = handleMessage;
-
-    return () => {
-      eventSource.close();
+      });
     };
-  }, []);
+  
+    const handleMessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.content) {
+        const userIdMatch = userList.find(
+          (user) => user.username === data.currentUser
+        );
+        console.log(userIdMatch);
+        if (userIdMatch) {
+          setSentMessages((prevMessages) => ({
+            ...prevMessages,
+            [userIdMatch.id]: [
+              ...(prevMessages[userIdMatch.id] || []),
+              {
+                user: data.currentUser,
+                message: data.content.message,
+              },
+            ],
+          }));
+        }
+      }
+    };
+  
+    useEffect(() => {
+      getLastMessages(conversationId).then((data) => {
+        setSentMessages((prevMessages) => ({
+          ...prevMessages,
+          [user]: data.messages.map((message) => ({
+            user: message.user,
+            message: message.content,
+          })),
+        }));
+      });
+      const url = new URL("http://localhost:9090/.well-known/mercure");
+      url.searchParams.append("topic", "https://example.com/my-private-topic");
+  
+      const eventSource = new EventSource(url, { withCredentials: true });
+      eventSource.onmessage = handleMessage;
+  
+      return () => {
+        eventSource.close();
+      };
+    }, [conversationId, getLastMessages, user, userList]);
 
   return (
     <>
