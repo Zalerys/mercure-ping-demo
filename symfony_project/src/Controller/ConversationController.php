@@ -66,51 +66,41 @@ class ConversationController extends AbstractController
     #[Route('/conversation/{conversationId}', name: 'get_conversation', methods: 'GET')]
     public function getConversation(Conversation $conversation)
     {
-        // Vérifier si la conversation existe
         if (!$conversation instanceof Conversation) {
             return $this->json([
                 'error' => 'Conversation non trouvée'
             ], 404);
         }
 
-        // Récupérer les détails de la conversation
         $participants = [];
         foreach ($conversation->getParticipants() as $participant) {
             $participants[] = [
                 'id' => $participant->getId(),
                 'username' => $participant->getUsername(),
-                // Ajoute d'autres détails si nécessaire
             ];
         }
 
         return $this->json([
             'conversation_id' => $conversation->getId(),
             'participants' => $participants,
-            // Ajoute d'autres détails de conversation si nécessaire
         ]);
     }
         private function findExistingConversation(array $users): ?Conversation
     {
-        // On va chercher une conversation qui a exactement les mêmes participants
         $conversationRepository = $this->entityManager->getRepository(Conversation::class);
-
-        // Récupérer toutes les conversations
         $conversations = $conversationRepository->findAll();
 
         foreach ($conversations as $conversation) {
-            // Récupérer les participants de la conversation actuelle
             $participants = $conversation->getParticipants()->toArray();
 
-            // Vérifier si les participants de la conversation correspondent exactement
             if (count($participants) === count($users) && $this->arrayContainsSameElements($participants, $users)) {
-                return $conversation; // Retourner la conversation existante
+                return $conversation; 
             }
         }
 
-        return null; // Aucune conversation trouvée avec les mêmes participants
+        return null; 
     }
 
-    // Méthode pour vérifier si deux tableaux ont les mêmes éléments, peu importe l'ordre
     private function arrayContainsSameElements(array $array1, array $array2): bool
     {
         sort($array1);

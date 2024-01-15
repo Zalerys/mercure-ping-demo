@@ -38,6 +38,17 @@ class MessageController extends AbstractController
         $messageContent = $data['content'];
         $conversationId = $data['conversation_id'];
         $currentUser = $data['currentUser'];
+
+        $conversation = $this->entityManager->getRepository(Conversation::class)->find($conversationId);
+        if (!$conversation) {
+            return $this->json(['error' => 'Conversation non trouvée'], 404);
+        }
+
+        $participants = $conversation->getParticipants();
+        if (!$participants->contains($user)) {
+            return $this->json(['error' => 'L\'utilisateur ne fait pas partie de cette conversation'], 403);
+        }
+
         $messageDB = $this->createAndPersistMessage($messageContent, $user, $conversationId);
 
 
@@ -119,7 +130,6 @@ class MessageController extends AbstractController
 
     private function createAndPersistMessage(string $content, ?User $sender, ?int $conversationId): Message
     {
-        // Si une conversation est spécifiée, on l'associe au message
         if ($conversationId) {
             $conversation = $this->entityManager->getRepository(Conversation::class)->find($conversationId);
 
@@ -130,13 +140,11 @@ class MessageController extends AbstractController
             $conversation = null;
         }
 
-        // Création d'une nouvelle instance de Message
         $message = new Message();
         $message->setContent($content);
         $message->setSender($sender);
         $message->setConversation($conversation);
 
-        // Enregistrement du message dans la base de données
         $this->entityManager->persist($message);
         $this->entityManager->flush();
 
