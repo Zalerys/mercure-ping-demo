@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useBackendMessage from "../Hook/useBackendMessage";
 import { SendHorizontal } from "lucide-react";
 
-function Chat({ user, userList }) {
+function Chat({ user, userList, conversationId }) {
   const backendMessage = useBackendMessage();
   const currentUser = sessionStorage.getItem("user");
   const [message, setMessage] = useState("");
@@ -10,7 +10,7 @@ function Chat({ user, userList }) {
 
   const submitMessagePrivate = async () => {
     const data = { message: message, user: currentUser };
-    backendMessage(user, message, currentUser).then((data) => {
+    backendMessage(user, message, currentUser, conversationId).then((data) => {
       setSentMessages((prevMessages) => ({
         ...prevMessages,
         [user]: [...(prevMessages[user] || []), { user: currentUser, message }],

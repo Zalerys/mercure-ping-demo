@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import useGetUserList from "../Hook/useGetUserList";
 import useBackendPing from "../Hook/useBackendPing";
+import useBackendCreateConversation from "../Hook/useBackendCreateConversation";
 import { Link } from "react-router-dom";
 import User from "./User";
 import Chat from "./Chat";
@@ -8,14 +9,20 @@ import Chat from "./Chat";
 export default function UserList() {
   const currentUser = sessionStorage.getItem("user");
   const [userList, setUserList] = useState([]);
+  const [conversationId, setConversationId] = useState(null);
   const getUserList = useGetUserList();
   const backendPing = useBackendPing();
+  const backendCreateConversation = useBackendCreateConversation();
 
   const [userMessage, setUserMessage] = useState();
 
   const handleClick = (user) => {
     backendPing(user).then((data) => console.log(data));
-    console.log("user: ", user);
+    const userIds = [sessionStorage.getItem("id"), user];
+    backendCreateConversation(userIds).then((data) => {
+      setConversationId(data.conversation_id);
+    });
+
     setUserMessage(user);
   };
 
@@ -65,7 +72,9 @@ export default function UserList() {
 
         <div className="w-full pb-5 text-center">
           <Link to="/all">
-            <button className="p-3 bg-blue-200 rounded-sm hover:bg-blue-400">Chat All Page</button>
+            <button className="p-3 bg-blue-200 rounded-sm hover:bg-blue-400">
+              Chat All Page
+            </button>
           </Link>
         </div>
 
@@ -81,7 +90,11 @@ export default function UserList() {
             <h1 className="w-full p-5 text-2xl font-semibold text-center text-black bg-blue-200">
               {userMessage}
             </h1>
-            <Chat user={userMessage} userList={userList} />
+            <Chat
+              user={userMessage}
+              userList={userList}
+              conversationId={conversationId}
+            />
           </>
         ) : null}{" "}
         <div></div>

@@ -1,5 +1,10 @@
 export default function useBackendMessage() {
-  return async function (toUserId, messageContent, currentUser) {
+  return async function (
+    toUserId,
+    messageContent,
+    currentUser,
+    conversationId
+  ) {
     return await fetch(`http://localhost:8245/send-message/${toUserId}`, {
       method: "POST",
       headers: {
@@ -7,7 +12,7 @@ export default function useBackendMessage() {
       },
       body: JSON.stringify({
         content: messageContent,
-        conversation_id: 2,
+        conversation_id: conversationId,
         currentUser: currentUser,
       }),
     })
