@@ -5,32 +5,33 @@ import useBackendCreateConversation from "../Hook/useBackendCreateConversation";
 import { Link } from "react-router-dom";
 import User from "./User";
 import Chat from "./Chat";
-import useGetLastMessage from '../Hook/useGetLastMessage';  
-
+import useGetLastMessage from "../Hook/useGetLastMessage";
 
 export default function UserList() {
   const currentUser = sessionStorage.getItem("user");
   const [userList, setUserList] = useState([]);
   const [conversationId, setConversationId] = useState(null);
-  const [historyConversation, setHistoryConversation] = useState([])
+  const [historyConversation, setHistoryConversation] = useState([]);
   const getUserList = useGetUserList();
   const backendPing = useBackendPing();
-  const getLastMessages = useGetLastMessage(); 
+  const getLastMessages = useGetLastMessage();
   const backendCreateConversation = useBackendCreateConversation();
 
   const [userMessage, setUserMessage] = useState();
 
-  const handleClick = (user) => {
+  async function handleClick(user) {
     backendPing(user).then((data) => console.log(data));
+
     const userIds = [sessionStorage.getItem("id"), user];
-    backendCreateConversation(userIds).then((data) => {
-      setConversationId(data.conversation_id);
-    });
-    getLastMessages(conversationId).then((data) => {
-      setHistoryConversation(data.content);
-    });
+    const conversationData = await backendCreateConversation(userIds);
+    setConversationId(conversationData.conversation_id);
+
+    const messagesData = await getLastMessages(
+      conversationData.conversation_id
+    );
+    setHistoryConversation(messagesData);
     setUserMessage(user);
-  };
+  }
 
   const handleMessage = (e) => {
     const data = JSON.parse(e.data);
