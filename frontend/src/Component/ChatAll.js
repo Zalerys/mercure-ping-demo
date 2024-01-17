@@ -3,13 +3,11 @@ import useBackendMessageToAll from "../Hook/useBackendMessageToAll";
 import useGetUserList from "../Hook/useGetUserList";
 import { Link } from "react-router-dom";
 import { SendHorizontal } from "lucide-react";
-import useGetLastMessage from "../Hook/useGetUserList";
 
 export default function UserList() {
   const [receivedMessages, setReceivedMessages] = useState([]);
   const backendMessageAll = useBackendMessageToAll();
   const getUserList = useGetUserList();
-  const getLastMessages = useGetLastMessage();
   const [newMessage, setNewMessage] = useState("");
 
   const currentUser = sessionStorage.getItem("user");
@@ -23,7 +21,7 @@ export default function UserList() {
     backendMessageAll(data).then(() => {});
   };
 
-  const handleMessageAll = (e) => {
+  const HandleMessageAll = (e) => {
     const data = JSON.parse(e.data);
     if (data.message.message) {
       const userIdMatch = listUser.current.find(
@@ -56,14 +54,10 @@ export default function UserList() {
     const eventSource = new EventSource(url, { withCredentials: true });
     eventSource.onmessage = HandleMessageAll;
 
-    getLastMessages().then((data) => {
-      setReceivedMessages(data.messages);
-      console.log(data.messages)
-    });
     return () => {
       eventSource.close();
     };
-  }, [getLastMessages]);
+  }, []);
 
   return (
     <div className="w-75">
