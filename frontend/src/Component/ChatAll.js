@@ -9,50 +9,39 @@ export default function UserList() {
   const backendMessageAll = useBackendMessageToAll();
   const getUserList = useGetUserList();
   const [newMessage, setNewMessage] = useState("");
-
-  const currentUser = sessionStorage.getItem("user");
+  const currentUser = sessionStorage.getItem("id");
 
   let listUser = useRef([]);
 
   const submitMessageAll = async (e) => {
     e.preventDefault();
     const message = newMessage;
-    const data = { message: message, user: currentUser };
-    backendMessageAll(data).then(() => {});
+    backendMessageAll(message, currentUser).then((response) => {
+      // Optionally reset newMessage here if needed
+      // setNewMessage("");
+    });
   };
 
-  const HandleMessageAll = (e) => {
-    const data = JSON.parse(e.data);
-    if (data.message.message) {
-      const userIdMatch = listUser.current.find(
-        (user) => user.username === data.message.message.user
-      );
-      if (userIdMatch) {
-        setReceivedMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            user: data.message.message.user,
-            message: data.message.message.message,
-          },
-        ]);
-      }
-    }
+  const handleMessageAll = (event) => {
+    const { content, from } = JSON.parse(event.data);
+    setReceivedMessages((prevMessages) => [
+      ...prevMessages,
+      { user: from, message: content },
+    ]);
   };
 
   useEffect(() => {
     getUserList().then((data) => {
-      const userListArray = Object.values(data.users);
-      listUser.current = userListArray;
+      listUser.current = Object.values(data.users);
     });
 
     const url = new URL("http://localhost:9090/.well-known/mercure");
-    url.searchParams.append(
-      "topic",
-      "https://example.com/my-public-message-all"
-    );
+    url.searchParams.append("topic", "https://example.com/conversations/1");
 
-    const eventSource = new EventSource(url, { withCredentials: true });
-    eventSource.onmessage = HandleMessageAll;
+    const eventSource = new EventSource(url.toString(), {
+      withCredentials: true,
+    });
+    eventSource.onmessage = handleMessageAll;
 
     return () => {
       eventSource.close();
@@ -71,7 +60,6 @@ export default function UserList() {
       <h1 className="p-5 text-xl font-semibold text-center border-y-4">
         Chat Général
       </h1>
-
       <div className="w-full h-screen overflow-y-scroll bg-gray-100">
         <div className="pb-16">
           {receivedMessages.map((message, index) => (
@@ -83,7 +71,6 @@ export default function UserList() {
           ))}
         </div>
       </div>
-
       <form
         onSubmit={submitMessageAll}
         className="mx-auto d-flex flex-column w-75 h-50"
@@ -94,12 +81,11 @@ export default function UserList() {
               type="text"
               className="w-5/6 py-4 pl-2 border-t-2 border-gray-300 form-control"
               placeholder="Écrire un message"
-              aria-describedby="basic-addon2"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
             />
             <div className="flex items-center justify-center w-1/6 p-3 bg-blue-200 hover:bg-blue-400">
-              <button className="" type="submit">
+              <button type="submit">
                 <SendHorizontal />
               </button>
             </div>

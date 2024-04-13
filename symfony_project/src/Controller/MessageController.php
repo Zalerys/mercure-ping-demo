@@ -84,21 +84,45 @@ class MessageController extends AbstractController
             ], 400);
         }
 
-        $message = [
-            'message' => $data['content'],
-        ];
+        $messageContent = $data['content'];
+        $userId = $data['currentUser'];
+        $currentUser = $this->entityManager->getRepository(User::class)->find($userId);
+
+        $conversationId = 1;
+
+        $conversation = $this->entityManager->getRepository(Conversation::class)->find($conversationId);
+        if (!$conversation) {
+            return $this->json([
+                'error' => 'Conversation non trouvée'
+            ], 404);
+        }
+
+        if (!$currentUser instanceof User) {
+            return $this->json([
+                'error' => 'Utilisateur actuel invalide'
+            ], 400);
+        }
+
+
+        $messageDB = $this->createAndPersistMessage($messageContent, $currentUser, $conversationId);
 
         $publicUpdate = new Update(
-            'https://example.com/my-public-message-all',
-            json_encode(['message' => $message])
+            'https://example.com/conversations/' . $conversationId,
+            json_encode([
+                'content' => $messageContent,
+                'from' => $currentUser->getUsername(),
+                'conversationId' => $conversationId
+            ]),
+            false  
         );
 
         $hub->publish($publicUpdate);
 
         return $this->json([
-            'message' => 'Message envoyé à tout le monde avec succès'
+            'message' => 'Message envoyé à la conversation avec succès'
         ]);
     }
+
 
 
 

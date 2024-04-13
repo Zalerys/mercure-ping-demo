@@ -1,6 +1,5 @@
 import React from "react";
 import { UserCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
 
 function User({ user, handleClick }) {
   return (

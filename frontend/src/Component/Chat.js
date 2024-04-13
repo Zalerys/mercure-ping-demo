@@ -24,7 +24,6 @@ function Chat({ user, userList, conversationId }) {
       const userIdMatch = userList.find(
         (user) => user.username === data.currentUser
       );
-      console.log(userIdMatch);
       if (userIdMatch) {
         setSentMessages((prevMessages) => ({
           ...prevMessages,
@@ -74,7 +73,6 @@ function Chat({ user, userList, conversationId }) {
           <input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            class="form-control"
             placeholder="Écrire un message"
             aria-describedby="basic-addon2"
             className="w-5/6 py-4 pl-2 border-t-2 border-gray-300"
