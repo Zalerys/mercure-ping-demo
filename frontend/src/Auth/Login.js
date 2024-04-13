@@ -33,8 +33,6 @@ export default function Login() {
         sessionStorage.setItem("user", username);
         sessionStorage.setItem("id", data.userId);
         navigate(from, { replace: true });
-      } else {
-        console.log(data);
       }
     });
   };

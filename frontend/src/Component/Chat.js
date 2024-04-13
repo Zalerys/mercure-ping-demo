@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useBackendMessage from "../Hook/useBackendMessage";
 import { SendHorizontal } from "lucide-react";
 
-function Chat({ user, userList }) {
+function Chat({ user, userList, conversationId }) {
   const backendMessage = useBackendMessage();
   const currentUser = sessionStorage.getItem("user");
   const [message, setMessage] = useState("");
@@ -10,7 +10,7 @@ function Chat({ user, userList }) {
 
   const submitMessagePrivate = async () => {
     const data = { message: message, user: currentUser };
-    backendMessage(user, data).then((data) => {
+    backendMessage(user, message, currentUser, conversationId).then((data) => {
       setSentMessages((prevMessages) => ({
         ...prevMessages,
         [user]: [...(prevMessages[user] || []), { user: currentUser, message }],
@@ -22,17 +22,16 @@ function Chat({ user, userList }) {
     const data = JSON.parse(e.data);
     if (data.content) {
       const userIdMatch = userList.find(
-        (user) => user.username === data.content.message.user
+        (user) => user.username === data.currentUser
       );
-
       if (userIdMatch) {
         setSentMessages((prevMessages) => ({
           ...prevMessages,
           [userIdMatch.id]: [
             ...(prevMessages[userIdMatch.id] || []),
             {
-              user: data.content.message.user,
-              message: data.content.message.message,
+              user: data.currentUser,
+              message: data.content.message,
             },
           ],
         }));
@@ -74,7 +73,6 @@ function Chat({ user, userList }) {
           <input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            class="form-control"
             placeholder="Écrire un message"
             aria-describedby="basic-addon2"
             className="w-5/6 py-4 pl-2 border-t-2 border-gray-300"
