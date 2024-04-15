@@ -89,7 +89,7 @@ export default function UserList() {
         {userMessage ? (
           <>
             <h1 className="w-full p-5 text-2xl font-semibold text-center text-black bg-blue-200">
-              {userMessage}
+            {userList.find(user => user.id === userMessage)?.username}
             </h1>
             <Chat
               user={userMessage}
