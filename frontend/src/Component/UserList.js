@@ -16,14 +16,13 @@ export default function UserList() {
 
   const [userMessage, setUserMessage] = useState();
 
-  const handleClick = (user) => {
-    backendPing(user).then((data) => console.log(data));
+  const handleClick = async (user) => {
+    backendPing(user).then((data) => data);
 
     const userIds = [sessionStorage.getItem("id"), user];
-    backendCreateConversation(userIds).then((data) => {
+    await backendCreateConversation(userIds).then((data) => {
       setConversationId(data.conversation_id);
     });
-
     setUserMessage(user);
   };
 

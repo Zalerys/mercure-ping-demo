@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import useBackendMessage from "../Hook/useBackendMessage";
 import { SendHorizontal } from "lucide-react";
+import useGetLastMessage from "../Hook/useGetLastMessage";
 
 function Chat({ user, userList, conversationId }) {
   const backendMessage = useBackendMessage();
   const currentUser = sessionStorage.getItem("user");
   const [message, setMessage] = useState("");
   const [sentMessages, setSentMessages] = useState({});
-
+  const getLastMessages = useGetLastMessage();
+  const [history, setHistory] = useState();
   const submitMessagePrivate = async () => {
-    const data = { message: message, user: currentUser };
-    backendMessage(user, message, currentUser, conversationId).then((data) => {
+    backendMessage(user, message, currentUser, conversationId).then(() => {
       setSentMessages((prevMessages) => ({
         ...prevMessages,
         [user]: [...(prevMessages[user] || []), { user: currentUser, message }],
@@ -40,6 +41,14 @@ function Chat({ user, userList, conversationId }) {
   };
 
   useEffect(() => {
+    const fetchHistory = async () => {
+      setHistory(await getLastMessages(conversationId));
+    };
+
+    fetchHistory();
+  }, [conversationId]);
+
+  useEffect(() => {
     const url = new URL("http://localhost:9090/.well-known/mercure");
     url.searchParams.append("topic", "https://example.com/my-private-topic");
 
@@ -56,6 +65,15 @@ function Chat({ user, userList, conversationId }) {
       <div className="w-full h-screen bg-gray-100">
         <div className="bg-gray-100">
           <div key={user.id}>
+            {history && (
+              <div className="m-5 text-center">
+                {history.map((messageObj, index) => (
+                  <span className="flex" key={index}>
+                    {messageObj.sender}: {messageObj.content}
+                  </span>
+                ))}
+              </div>
+            )}
             {sentMessages[user] && (
               <div className="m-5 text-center">
                 {sentMessages[user].map((messageObj, index) => (
